@@ -1,0 +1,5 @@
+imports:
+  - { resource: framework.yaml }
+  - { resource: monolog.yaml }
+  - { resource: doctrine.yaml }
+  - { resource: qone_privacy_bundle.yaml }

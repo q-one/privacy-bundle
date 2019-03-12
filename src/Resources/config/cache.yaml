@@ -1,0 +1,13 @@
+services:
+  _defaults:
+    autowire: false
+    autoconfigure: false
+    public: false
+
+  QOne\PrivacyBundle\CacheWarmer\MetadataCacheWarmer:
+    arguments:
+      - '@QOne\PrivacyBundle\Mapping\MetadataRegistryInterface'
+
+  QOne\PrivacyBundle\CacheClearer\MetadataCacheClearer:
+    arguments:
+      - '@qone_privacy.cache.metadata'

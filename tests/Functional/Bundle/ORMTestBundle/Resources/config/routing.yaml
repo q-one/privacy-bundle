@@ -1,0 +1,11 @@
+test_create:
+  path: /test/create
+  controller: QOne\PrivacyBundle\Tests\Functional\Bundle\ORMTestBundle\Controller\TestController::createAction
+
+test_survey:
+  path: /test/survey
+  controller: QOne\PrivacyBundle\Tests\Functional\Bundle\ORMTestBundle\Controller\TestController::surveyAction
+
+test_collector:
+  path: /test/collector
+  controller: QOne\PrivacyBundle\Tests\Functional\Bundle\ORMTestBundle\Controller\TestController::collectorAction

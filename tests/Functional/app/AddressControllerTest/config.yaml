@@ -1,0 +1,18 @@
+imports:
+  - { resource: ../config/config.yaml }
+
+doctrine:
+  orm:
+    mappings:
+      test_bundle:
+        is_bundle: false
+        alias: TestBundle
+        type: annotation
+        prefix: QOne\PrivacyBundle\Tests\Functional\Bundle\TestBundle\Entity
+        dir: "%kernel.project_dir%/../Bundle/TestBundle/Entity"
+
+qone_privacy:
+  mapping:
+    loaders:
+      default:
+        paths: ['%kernel.root_dir%/../Bundle/TestBundle/Entity/']

@@ -1,0 +1,15 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  QOne\PrivacyBundle\Tests\Functional\Bundle\TestBundle\Controller\:
+    resource: '../../Controller/'
+    tags: ['controller.service_arguments']
+    calls:
+    - [setContainer, ["@service_container"]]
+
+  QOne\PrivacyBundle\Tests\Functional\Bundle\TestBundle\DataFixtures\:
+    resource: '../../DataFixtures/'
+    tags: ['doctrine.fixtures.orm']

@@ -1,0 +1,67 @@
+{
+    "name": "q-one/privacy-bundle",
+    "description": "The QOnePrivacyBundle offers advanced privacy and data protection features for the well-known Doctrine persistence bundles.",
+    "type": "symfony-bundle",
+    "keywords": ["dsgvo", "privacy"],
+    "version": "0.0.1",
+    "authors": [
+        {
+            "name": "Q.One Technologies GmbH",
+            "homepage": "https://www.q-one.com"
+        }
+    ],
+    "autoload":{
+        "psr-4":{
+            "QOne\\PrivacyBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "QOne\\PrivacyBundle\\Tests\\": "tests"
+        }
+    },
+    "require": {
+        "php": "^7.2",
+        "ext-json": "*",
+        "symfony/config": "^4.0",
+        "symfony/debug": "^4.0",
+        "symfony/dependency-injection": "^4.0",
+        "symfony/event-dispatcher": "^4.0",
+        "symfony/finder": "^4.0",
+        "symfony/framework-bundle": "^4.0",
+        "symfony/http-foundation": "^4.0",
+        "symfony/http-kernel": "^4.0",
+        "symfony/routing": "^4.0",
+        "symfony/security-core": "^4.0",
+        "symfony/validator": "^4.0",
+        "symfony/orm-pack": "*",
+        "symfony/serializer-pack": "^1.0",
+        "eightpoints/guzzle-bundle": "~7.3",
+        "guzzlehttp/guzzle": "~6.0",
+        "sensio/framework-extra-bundle": "^5.2",
+        "doctrine/annotations": "^1.6"
+    },
+    "require-dev": {
+        "liip/functional-test-bundle": "~2.0@alpha",
+        "phpunit/phpunit": "^7.1",
+        "symfony/phpunit-bridge": "^4.0",
+        "symfony/monolog-bundle": "^3.0",
+        "symfony/yaml": "^4.0",
+        "doctrine/doctrine-fixtures-bundle": "^3.0"
+    },
+    "conflict": {
+        "eightpoints/guzzle-bundle": "<7.3||>=7.4",
+        "guzzlehttp/guzzle": "<6.0||>=6.4"
+    },
+    "suggest": {
+        "eightpoints/guzzle-bundle": "Provides easy configuration management for guzzlehttp/guzzle \"Client\" instances.",
+        "guzzlehttp/guzzle": "Needed to make use of the \"http\" type collector."
+    },
+    "minimum-stability": "stable",
+    "license": "MIT",
+    "extra": {
+    	"branch-alias": {
+		    "dev-master": "0.0.1"
+	    }
+    }
+}

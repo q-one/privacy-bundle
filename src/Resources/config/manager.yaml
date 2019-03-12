@@ -1,0 +1,44 @@
+services:
+  _defaults:
+    public: false
+    autoconfigure: false
+    autowire: false
+
+  qone_privacy.collector:
+    class: QOne\PrivacyBundle\Manager\Collector
+    public: true
+  QOne\PrivacyBundle\Manager\CollectorInterface: '@qone_privacy.collector'
+
+  qone_privacy.publisher:
+    class: QOne\PrivacyBundle\Manager\Publisher
+    public: true
+    arguments:
+      - '@QOne\PrivacyBundle\Manager\PrivacyManagerInterface'
+      - '@QOne\PrivacyBundle\Mapping\MetadataRegistryInterface'
+      - '@doctrine'
+    calls:
+      - method: setContainer
+        arguments: ['@service_container']
+      - method: setLogger
+        arguments: ['@logger']
+    tags:
+      - { name: monolog.logger, channel: qone_privacy }
+  QOne\PrivacyBundle\Manager\PublisherInterface: '@qone_privacy.publisher'
+
+  qone_privacy.manager.privacy_manager:
+    class: QOne\PrivacyBundle\Manager\PrivacyManager
+    arguments:
+      - '@QOne\PrivacyBundle\Mapping\MetadataRegistryInterface'
+      - '@doctrine'
+      - '@QOne\PrivacyBundle\Persistence\PersistenceManagerInterface'
+      - '%qone_privacy.persistence.object_managers.legacy%'
+    calls:
+      - method: setContainer
+        arguments: ['@service_container']
+      - method: setLogger
+        arguments: ['@logger']
+      - method: setReevaluationInterval
+        arguments: ['%qone_privacy.obsolescence.reevaluation_interval%']
+    tags:
+      - { name: monolog.logger, channel: qone_privacy }
+  QOne\PrivacyBundle\Manager\PrivacyManagerInterface: '@qone_privacy.manager.privacy_manager'

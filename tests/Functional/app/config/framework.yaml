@@ -1,0 +1,7 @@
+framework:
+    secret: test
+    router: { resource: "%kernel.project_dir%/%kernel.test_case%/routing.yaml" }
+    test: ~
+    default_locale: en
+    property_info:
+        enabled: true

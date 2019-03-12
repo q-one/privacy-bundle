@@ -1,0 +1,31 @@
+services:
+  _defaults:
+    autowire: false
+    autoconfigure: false
+    public: true
+
+  qone_privacy.mapping.metadata_registry:
+    class: QOne\PrivacyBundle\Mapping\LazyLoadingMetadataRegistry
+    arguments:
+      - '@qone_privacy.mapping.loader'
+    calls:
+      - method: setCache
+        arguments: ['@qone_privacy.cache.metadata']
+      - method: setLoader
+        arguments: ['@qone_privacy.mapping.loader']
+
+  QOne\PrivacyBundle\Mapping\MetadataRegistryInterface: '@qone_privacy.mapping.metadata_registry'
+
+  qone_privacy.mapping.loader:
+    class: QOne\PrivacyBundle\Mapping\Loader\ChainedLoader
+
+  QOne\PrivacyBundle\Mapping\Loader\AnnotationLoader:
+    arguments:
+      - '@annotations.cached_reader'
+
+  qone_privacy.expression_evaluator:
+    class: QOne\PrivacyBundle\Mapping\ObjectExpressionEvaluator
+    arguments:
+      - '@QOne\PrivacyBundle\Mapping\MetadataRegistryInterface'
+      - null
+  QOne\PrivacyBundle\Mapping\ObjectExpressionEvaluatorInterface: '@qone_privacy.expression_evaluator'

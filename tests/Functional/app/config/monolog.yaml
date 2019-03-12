@@ -1,0 +1,7 @@
+monolog:
+  handlers:
+    console:
+      type: stream
+      path: "php://stderr"
+      process_psr_3_messages: true
+      level: debug

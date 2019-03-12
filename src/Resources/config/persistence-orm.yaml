@@ -1,0 +1,23 @@
+services:
+  _defaults:
+    public: false
+    autoconfigure: false
+    autowire: false
+
+  qone_privacy.orm.privacy_orm_listener:
+    class: QOne\PrivacyBundle\ORM\PrivacyORMListener
+    arguments:
+      - '@QOne\PrivacyBundle\Mapping\MetadataRegistryInterface'
+      - '@doctrine'
+      - '@QOne\PrivacyBundle\Mapping\ObjectExpressionEvaluatorInterface'
+    calls:
+      - method: setLogger
+        arguments: ['@logger']
+    tags:
+      - { name: doctrine.event_subscriber }
+      - { name: monolog.logger, channel: qone_privacy }
+
+  QOne\PrivacyBundle\Persistence\PersistenceManagerInterface: '@qone_privacy.orm.orm_persistence_manager'
+
+  qone_privacy.orm.orm_persistence_manager:
+    class: QOne\PrivacyBundle\ORM\ORMPersistenceManager

@@ -1,0 +1,18 @@
+services:
+  _defaults:
+    public: true
+    autoconfigure: false
+    autowire: false
+
+  QOne\PrivacyBundle\Condition\ObsoleteExprEvaluator:
+    arguments:
+      - '@doctrine'
+    calls:
+      - method: setContainer
+        arguments: ['@service_container']
+
+  QOne\PrivacyBundle\Condition\ObsoleteAfterEvaluator:
+    arguments:
+      - '@doctrine'
+
+  QOne\PrivacyBundle\Condition\ObsoleteCascadeEvaluator: ~

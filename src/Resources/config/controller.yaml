@@ -1,0 +1,12 @@
+services:
+  _defaults:
+    autowire: false
+    autoconfigure: false
+    public: true
+
+  QOne\PrivacyBundle\Controller\PublisherController:
+    class: QOne\PrivacyBundle\Controller\PublisherController
+    arguments:
+      - '@QOne\PrivacyBundle\Manager\PublisherInterface'
+      - '@QOne\PrivacyBundle\Manager\CollectorInterface'
+    tags: ['controller.service_arguments']

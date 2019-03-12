@@ -1,0 +1,11 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  QOne\PrivacyBundle\Tests\Functional\Bundle\ORMTestBundle\Controller\:
+    resource: '../../Controller/'
+    tags: ['controller.service_arguments']
+    calls:
+      - [setContainer, ["@service_container"]]

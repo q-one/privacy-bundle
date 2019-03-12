@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    public: true
+    autowire: false
+    autoconfigure: false
+
+  QOne\PrivacyBundle\Transformer\IdentityFieldTransformer: ~

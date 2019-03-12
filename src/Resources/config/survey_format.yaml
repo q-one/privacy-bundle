@@ -1,0 +1,65 @@
+services:
+  _defaults:
+    autowire: false
+    autoconfigure: false
+    public: true
+
+  qone_privacy.survey.format.serializer.class_discriminator_resolver:
+    class: QOne\PrivacyBundle\Survey\Format\Serializer\ClassDiscriminatorByName
+    arguments:
+      - [
+        'QOne\PrivacyBundle\Survey\SurveyInterface',
+        'QOne\PrivacyBundle\Survey\FileListInterface',
+        'QOne\PrivacyBundle\Survey\FileInterface',
+        'QOne\PrivacyBundle\Survey\GroupInterface',
+        'QOne\PrivacyBundle\Survey\RecordInterface',
+        'QOne\PrivacyBundle\Persistence\Object\ObjectReferenceInterface'
+        ]
+      - true
+
+  qone_privacy.survey.format.serializer.encoder.json_encoder:
+    class: Symfony\Component\Serializer\Encoder\JsonEncoder
+
+  qone_privacy.survey.format.serializer.encoder.xml_encoder:
+    class: Symfony\Component\Serializer\Encoder\XmlEncoder
+
+  qone_privacy.survey.format.serializer.normalizer.date_interval_normalizer:
+    class: Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer
+
+  qone_privacy.survey.format.serializer.normalizer.date_time_normalizer:
+    class: Symfony\Component\Serializer\Normalizer\DateTimeNormalizer
+    arguments:
+      - datetime_format: !php/const DateTimeInterface::RFC3339_EXTENDED
+
+  qone_privacy.survey.format.serializer.normalizer.array_denormalizer:
+    class: Symfony\Component\Serializer\Normalizer\ArrayDenormalizer
+
+  qone_privacy.survey.format.serializer.normalizer.object_normalizer:
+    class: Symfony\Component\Serializer\Normalizer\ObjectNormalizer
+    arguments:
+      - null
+      - null
+      - null
+      - null
+      - '@qone_privacy.survey.format.serializer.class_discriminator_resolver'
+
+  qone_privacy.survey.format.serializer:
+    class: Symfony\Component\Serializer\Serializer
+    public: true
+    arguments:
+      - [
+        '@qone_privacy.survey.format.serializer.normalizer.date_interval_normalizer',
+        '@qone_privacy.survey.format.serializer.normalizer.date_time_normalizer',
+        '@qone_privacy.survey.format.serializer.normalizer.array_denormalizer',
+        '@qone_privacy.survey.format.serializer.normalizer.object_normalizer'
+        ]
+      - json: '@qone_privacy.survey.format.serializer.encoder.json_encoder'
+        xml: '@qone_privacy.survey.format.serializer.encoder.xml_encoder'
+
+  QOne\PrivacyBundle\Survey\Format\JsonStrategy:
+    arguments:
+      - '@qone_privacy.survey.format.serializer'
+
+  QOne\PrivacyBundle\Survey\Format\XmlStrategy:
+    arguments:
+      - '@qone_privacy.survey.format.serializer'

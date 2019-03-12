@@ -1,0 +1,23 @@
+doctrine:
+  dbal:
+    default_connection: default
+    connections:
+      default:
+        logging: true
+        driver: 'pdo_mysql'
+        server_version: '5.7'
+        options:
+          !php/const PDO::MYSQL_ATTR_INIT_COMMAND: "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci', sql_mode='NO_ENGINE_SUBSTITUTION';"
+        charset: utf8mb4
+        default_table_options:
+          charset: utf8mb4
+          collate: utf8mb4_unicode_ci
+        url: '%env(resolve:DATABASE_URL)%-test'
+  orm:
+    auto_generate_proxy_classes: '%kernel.debug%'
+    default_entity_manager: default
+    entity_managers:
+      auto_mapping: true
+      default:
+        connection: default
+        naming_strategy: doctrine.orm.naming_strategy.underscore

@@ -1,0 +1,30 @@
+qone_privacy:
+  collector:
+    enabled: true
+    data_sources:
+      local:
+        factory: QOne\PrivacyBundle\Delivery\LocalDelivery
+      external_service01:
+        factory: QOne\PrivacyBundle\Delivery\HttpDelivery
+        #http_client: "eight_points_guzzle.client.external_service01"
+        http_path: /_privacy
+        base_uri: http://localhost
+      #external_service02:
+      #  factory: QOne\PrivacyBundle\Delivery\ServiceProxy
+      #  id: 'App\Privacy\Delivery\CustomDeliveryMethod'
+  publisher:
+    enabled: true
+    path: /_privacy
+    encoding_strategy: "QOne\\PrivacyBundle\\Survey\\Format\\JsonStrategy"
+  obsolescence:
+    default_policy: "QOne\\PrivacyBundle\\Policy\\NullPolicy"
+    default_verdict: "QOne\\PrivacyBundle\\Verdict\\UnanimousVerdict"
+  persistence:
+    mapper: orm
+  mapping:
+    cache: cache.system
+    lazy_loading: false
+    loaders:
+      default:
+        class: "QOne\\PrivacyBundle\\Mapping\\Loader\\AnnotationLoader"
+        extensions: ['.php']
