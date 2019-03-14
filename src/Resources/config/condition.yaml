@@ -16,3 +16,6 @@ services:
       - '@doctrine'
 
   QOne\PrivacyBundle\Condition\ObsoleteCascadeEvaluator: ~
+
+  QOne\PrivacyBundle\Condition\ObsoleteNullEvaluator: ~
+
