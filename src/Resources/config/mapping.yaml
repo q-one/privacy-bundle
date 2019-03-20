@@ -5,7 +5,7 @@ services:
     public: true
 
   qone_privacy.mapping.metadata_registry:
-    class: QOne\PrivacyBundle\Mapping\LazyLoadingMetadataRegistry
+    class: QOne\PrivacyBundle\Mapping\MetadataRegistry
     arguments:
       - '@qone_privacy.mapping.loader'
     calls:

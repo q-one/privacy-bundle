@@ -1,26 +1,13 @@
 <?php
 
 /*
- * Copyright 2018-2019 Q.One Technologies GmbH, Essen
- * This file is part of QOnePrivacyBundle.
+ * Copyright (c) 2018-2019 Q.One Technologies GmbH, Essen
+ * All rights reserved.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
- * of the Software, and to permit persons to whom the Software is furnished to do
- * so, subject to the following conditions:
+ * This file is part of CloudBasket.
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
+ * NOTICE: The contents of this file are CONFIDENTIAL and MUST NOT be published
+ * nor redistributed without prior written permission.
  */
 
 namespace QOne\PrivacyBundle\ORM;
@@ -190,8 +177,8 @@ class PrivacyORMListener implements EventSubscriber, LoggerAwareInterface
             return;
         }
 
-        $user = $this->expressionEvaluator->getAttachedUser($entity);
         $metadata = $this->metadataRegistry->getMetadataFor($entityClass);
+        $user = $this->expressionEvaluator->getAttachedUser($metadata, $entity);
 
         /** @var EntityReference $userReference */
         /** @var ObservedEntityReference $entityReference */
@@ -207,7 +194,7 @@ class PrivacyORMListener implements EventSubscriber, LoggerAwareInterface
         }
 
         foreach ($metadata->getGroups() as $group) {
-            $source = $this->expressionEvaluator->getAttachedSource($entity, $group->getId());
+            $source = $this->expressionEvaluator->getAttachedSource($group, $entity);
             $asset = &$this->insertionState[];
             $asset = new Asset($userReference, $entityReference, $group->getId(), $source);
 
@@ -270,10 +257,11 @@ class PrivacyORMListener implements EventSubscriber, LoggerAwareInterface
             return;
         }
 
-        $user = $this->expressionEvaluator->getAttachedUser($entity);
+        $metadata = $this->metadataRegistry->getMetadataFor($entityClass);
+        $user = $this->expressionEvaluator->getAttachedUser($metadata, $entity);
+
         /** @var EntityReference $userReference */
         $userReference = $this->createUserReference($user);
-        $metadata = $this->metadataRegistry->getMetadataFor($entityClass);
 
         $em = $eventArgs->getEntityManager();
         $uow = $em->getUnitOfWork();
@@ -284,7 +272,7 @@ class PrivacyORMListener implements EventSubscriber, LoggerAwareInterface
         foreach ($metadata->getGroups() as $group) {
             $groupId = $group->getId();
             $groupPreUpdate = &$this->preUpdateState[$oid][$groupId];
-            $source = $this->expressionEvaluator->getAttachedSource($entity, $groupId);
+            $source = $this->expressionEvaluator->getAttachedSource($group, $entity);
 
             if (null === $groupPreUpdate['asset']) {
                 /** @var ObservedEntityReference $entityReference */
@@ -366,9 +354,9 @@ class PrivacyORMListener implements EventSubscriber, LoggerAwareInterface
             return;
         }
 
-        $user = $this->expressionEvaluator->getAttachedUser($entity);
-        $userReference = $this->createUserReference($user);
         $metadata = $this->metadataRegistry->getMetadataFor($entityClass);
+        $user = $this->expressionEvaluator->getAttachedUser($metadata, $entity);
+        $userReference = $this->createUserReference($user);
 
         $em = $eventArgs->getEntityManager();
         $uow = $em->getUnitOfWork();

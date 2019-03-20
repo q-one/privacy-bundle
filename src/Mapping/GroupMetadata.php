@@ -1,29 +1,18 @@
 <?php
 
 /*
- * Copyright 2018-2019 Q.One Technologies GmbH, Essen
- * This file is part of QOnePrivacyBundle.
+ * Copyright (c) 2018-2019 Q.One Technologies GmbH, Essen
+ * All rights reserved.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
- * of the Software, and to permit persons to whom the Software is furnished to do
- * so, subject to the following conditions:
+ * This file is part of CloudBasket.
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
+ * NOTICE: The contents of this file are CONFIDENTIAL and MUST NOT be published
+ * nor redistributed without prior written permission.
  */
 
 namespace QOne\PrivacyBundle\Mapping;
+
+use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * Class GroupMetadata.
@@ -45,20 +34,20 @@ class GroupMetadata implements GroupMetadataInterface
     /** @var string|null */
     protected $auditTransformer;
 
-    /** @var string|null */
+    /** @var Expression|null */
     protected $sourceExpr;
 
     /**
      * GroupMetadata constructor.
      *
-     * @param string $id
-     * @param array  $fields
-     * @param array  $conditions
-     * @param string $policy
-     * @param string $auditTransformer
-     * @param string $sourceExpr
+     * @param string          $id
+     * @param array           $fields
+     * @param array           $conditions
+     * @param string          $policy
+     * @param string          $auditTransformer
+     * @param Expression|null $sourceExpr
      */
-    public function __construct(string $id, array $fields, array $conditions, ?string $policy, ?string $auditTransformer, ?string $sourceExpr)
+    public function __construct(string $id, array $fields, array $conditions, ?string $policy, ?string $auditTransformer, ?Expression $sourceExpr)
     {
         $this->id = $id;
         $this->fields = $fields;
@@ -93,7 +82,7 @@ class GroupMetadata implements GroupMetadataInterface
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getPolicy(): ?string
     {
@@ -101,7 +90,7 @@ class GroupMetadata implements GroupMetadataInterface
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getAuditTransformer(): ?string
     {
@@ -109,9 +98,9 @@ class GroupMetadata implements GroupMetadataInterface
     }
 
     /**
-     * @return null|string
+     * @return Expression|null
      */
-    public function getSourceExpr(): ?string
+    public function getSourceExpr(): ?Expression
     {
         return $this->sourceExpr;
     }

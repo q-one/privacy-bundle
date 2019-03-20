@@ -1,26 +1,13 @@
 <?php
 
 /*
- * Copyright 2018-2019 Q.One Technologies GmbH, Essen
- * This file is part of QOnePrivacyBundle.
+ * Copyright (c) 2018-2019 Q.One Technologies GmbH, Essen
+ * All rights reserved.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
- * of the Software, and to permit persons to whom the Software is furnished to do
- * so, subject to the following conditions:
+ * This file is part of CloudBasket.
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
+ * NOTICE: The contents of this file are CONFIDENTIAL and MUST NOT be published
+ * nor redistributed without prior written permission.
  */
 
 namespace QOne\PrivacyBundle\Mapping\Loader;
@@ -33,6 +20,7 @@ use QOne\PrivacyBundle\Annotation\Obsolesce;
 use QOne\PrivacyBundle\Exception\PrivacyException;
 use QOne\PrivacyBundle\Mapping\ClassMetadataInterface;
 use QOne\PrivacyBundle\Mapping\GroupMetadata;
+use QOne\PrivacyBundle\Mapping\ObjectExpressionEvaluatorInterface;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -41,6 +29,11 @@ use Symfony\Component\Finder\Finder;
 class AnnotationLoader implements LoaderInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
+
+    /**
+     * @var ObjectExpressionEvaluatorInterface
+     */
+    protected $evaluator;
 
     /**
      * @var Reader
@@ -55,10 +48,12 @@ class AnnotationLoader implements LoaderInterface, LoggerAwareInterface
     /**
      * AnnotationLoader constructor.
      *
-     * @param Reader $reader
+     * @param ObjectExpressionEvaluatorInterface $evaluator
+     * @param Reader                             $reader
      */
-    public function __construct(Reader $reader)
+    public function __construct(ObjectExpressionEvaluatorInterface $evaluator, Reader $reader)
     {
+        $this->evaluator = $evaluator;
         $this->reader = $reader;
     }
 
@@ -92,7 +87,7 @@ class AnnotationLoader implements LoaderInterface, LoggerAwareInterface
                             $annotation->getConditions(),
                             $annotation->getPolicy(),
                             $annotation->getAuditTransformer(),
-                            $annotation->getSource()
+                            $annotation->getSource() ? $this->evaluator->parseExpression($annotation->getSource()) : null
                         );
 
                         $classMetadata->addGroup($group);
@@ -100,7 +95,9 @@ class AnnotationLoader implements LoaderInterface, LoggerAwareInterface
                         break;
 
                     case $annotation instanceof Audited:
-                        $classMetadata->setUserExpr($annotation->getUser());
+                        $classMetadata->setUserExpr(
+                            $this->evaluator->parseExpression($annotation->getUser())
+                        );
                         $loaded = true;
                         break;
                 }

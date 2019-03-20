@@ -1,39 +1,30 @@
 <?php
 
 /*
- * Copyright 2018-2019 Q.One Technologies GmbH, Essen
- * This file is part of QOnePrivacyBundle.
+ * Copyright (c) 2018-2019 Q.One Technologies GmbH, Essen
+ * All rights reserved.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
- * of the Software, and to permit persons to whom the Software is furnished to do
- * so, subject to the following conditions:
+ * This file is part of CloudBasket.
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
+ * NOTICE: The contents of this file are CONFIDENTIAL and MUST NOT be published
+ * nor redistributed without prior written permission.
  */
 
 namespace QOne\PrivacyBundle\Mapping;
 
-use Doctrine\Common\Util\ClassUtils;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\ParsedExpression;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class ObjectExpressionEvaluator.
  */
-class ObjectExpressionEvaluator implements ObjectExpressionEvaluatorInterface
+class ObjectExpressionEvaluator implements ContainerAwareInterface, ObjectExpressionEvaluatorInterface
 {
+    use ContainerAwareTrait;
+
     /**
      * @var MetadataRegistryInterface
      */
@@ -57,79 +48,51 @@ class ObjectExpressionEvaluator implements ObjectExpressionEvaluatorInterface
     }
 
     /**
-     * @param object $entity
-     *
-     * @return UserInterface|null
+     * {@inheritdoc}
      */
-    public function getAttachedUser(object $entity): ? UserInterface
+    public function parseExpression(string $expr): ParsedExpression
     {
-        if (null === $metadata = $this->getMetadata($entity)) {
-            return null;
-        }
+        return $this->expressionLanguage->parse($expr, array_keys($this->getReferences(null)));
+    }
 
-        $variables = [
-            'this' => $entity,
-        ];
-
+    /**
+     * {@inheritdoc}
+     */
+    public function getAttachedUser(ClassMetadataInterface $classMetadata, object $entity): ? UserInterface
+    {
         return $this->expressionLanguage->evaluate(
-            $metadata->getUserExpr(),
-            $variables
+            $classMetadata->getUserExpr(),
+            $this->getReferences($entity)
         );
     }
 
     /**
-     * @param object $entity
-     *
-     * @return string|null
+     * {@inheritdoc}
      */
-    public function getAttachedSource(object $entity, string $groupId): ? string
+    public function getAttachedSource(GroupMetadataInterface $groupMetadata, object $entity): ? string
     {
-        if (null === $metadata = $this->getMetadata($entity)) {
+        if (null === $sourceExpr = $groupMetadata->getSourceExpr()) {
             return null;
         }
-
-        if (!$metadata->hasGroup($groupId)) {
-            throw new \InvalidArgumentException(sprintf('Group %s requested but does not exist', $groupId));
-        }
-
-        $group = $metadata->getGroup($groupId);
-
-        if (null === $sourceExpr = $group->getSourceExpr()) {
-            return null;
-        }
-
-        $variables = [
-            'this' => $entity,
-        ];
 
         return $this->expressionLanguage->evaluate(
             $sourceExpr,
-            $variables
+            $this->getReferences($entity)
         );
     }
 
     /**
-     * @param object $entity
-     * @param string $expression
-     * @param array  $variables
+     * Returns an associative array with the usable variables in expressions.
      *
-     * @return mixed
+     * @param object|null $that
+     *
+     * @return array
      */
-    public function evaluateFrom(object $entity, string $expression, array $variables = [])
+    private function getReferences(?object $that)
     {
-        $variables['this'] = $entity;
-
-        return $this->expressionLanguage->evaluate($expression, $variables);
-    }
-
-    private function getMetadata(object $entity): ? ClassMetadataInterface
-    {
-        $entityClass = ClassUtils::getClass($entity);
-
-        if (!$this->metadataRegistry->hasMetadataFor($entityClass)) {
-            return null;
-        }
-
-        return $this->metadataRegistry->getMetadataFor($entityClass);
+        return [
+            'this' => $that,
+            'container' => $this->container,
+        ];
     }
 }

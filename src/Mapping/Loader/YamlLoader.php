@@ -15,11 +15,17 @@ namespace QOne\PrivacyBundle\Mapping\Loader;
 use QOne\PrivacyBundle\Exception\PrivacyException;
 use QOne\PrivacyBundle\Mapping\ClassMetadataInterface;
 use QOne\PrivacyBundle\Mapping\GroupMetadata;
+use QOne\PrivacyBundle\Mapping\ObjectExpressionEvaluatorInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 
 class YamlLoader implements LoaderInterface
 {
+    /**
+     * @var ObjectExpressionEvaluatorInterface
+     */
+    protected $evaluator;
+
     /**
      * @var Finder|null
      */
@@ -28,10 +34,12 @@ class YamlLoader implements LoaderInterface
     /**
      * YamlLoader constructor.
      *
-     * @param Finder|null $finder
+     * @param ObjectExpressionEvaluatorInterface $evaluator
+     * @param Finder|null                        $finder
      */
-    public function __construct(Finder $finder = null)
+    public function __construct(ObjectExpressionEvaluatorInterface $evaluator, Finder $finder = null)
     {
+        $this->evaluator = $evaluator;
         $this->setFinder($finder ?: new Finder());
     }
 
@@ -71,7 +79,9 @@ class YamlLoader implements LoaderInterface
         $classConfig = $yamlArray[$className];
 
         if ($user = $classConfig['user']) {
-            $metadata->setUserExpr($user);
+            $metadata->setUserExpr(
+                $this->evaluator->parseExpression($user)
+            );
         }
 
         $groupArray = $classConfig['groups'];
@@ -106,7 +116,7 @@ class YamlLoader implements LoaderInterface
                 $conditions,
                 $groupCfg['policy'] ?? null,
                 $groupCfg['transformer'] ?? null,
-                $groupCfg['source'] ?? null
+                $groupCfg['source'] ? $this->evaluator->parseExpression($groupCfg['source']) : null
             );
 
             $metadata->addGroup($group);
