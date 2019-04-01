@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="q-one/privacy-bundle">
+    <import file="${basedir}/../../../../build/php-symfony/build-defaults.xml"/>
+
+    <target name="prepare-build"
+            depends="symfony-cleanup,composer-install-dev"
+    />
+
+    <target name="analysis"
+            depends="static-analysis-parallel,phpdox"
+    />
+
+    <target name="tests-unit"
+            depends="phpunit-unit"
+    />
+
+    <target name="tests-functional"
+            depends="phpunit-functional"
+    />
+
+    <target name="prepare-dist"
+            depends="symfony-cleanup"
+    />
+</project>
