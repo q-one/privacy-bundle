@@ -52,11 +52,22 @@ abstract class UpdateFieldValuePolicy extends ManagerRegistryAwarePolicy impleme
         $refClass = $verdict->getClassMetadata()->getReflectionClass();
 
         foreach ($fields as $fieldName) {
-            $property = $refClass->getProperty($fieldName);
-            $property->setAccessible(true);
+            $methodName = 'set'.ucfirst($fieldName);
 
-            $newValue = $this->transformFieldValue($object, $fieldName, $property->getValue($object));
-            $property->setValue($object, $newValue);
+            if ($refClass->hasMethod($methodName)) {
+                $property = $refClass->getProperty($fieldName);
+                $property->setAccessible(true);
+
+                $refMethod = $refClass->getMethod($methodName);
+                $refMethod->setAccessible(true);
+                $newValue = $this->transformFieldValue($object, $fieldName, $property->getValue($object));
+                $refMethod->invoke($object, $newValue);
+            } else {
+                $property = $refClass->getProperty($fieldName);
+                $property->setAccessible(true);
+                $newValue = $this->transformFieldValue($object, $fieldName, $property->getValue($object));
+                $property->setValue($object, $newValue);
+            }
         }
 
         $om->persist($object);
