@@ -209,10 +209,17 @@ class Publisher implements ContainerAwareInterface, LoggerAwareInterface, Publis
     {
         try {
             $refClass = new \ReflectionClass($object);
+            $methodName = 'get' . ucfirst($fieldName);
 
-            $property = $refClass->getProperty($fieldName);
-            $property->setAccessible(true);
-            $fieldValue = $property->getValue($object);
+            if($refClass->hasMethod($methodName)) {
+                $refMethod = $refClass->getMethod($methodName);
+                $refMethod->setAccessible(true);
+                $fieldValue = $refMethod->invoke($object);
+            }else {
+                $property = $refClass->getProperty($fieldName);
+                $property->setAccessible(true);
+                $fieldValue = $property->getValue($object);
+            }
         } catch (\ReflectionException $e) {
             throw new NoSuchFieldException(
                 sprintf('Tried to fetch %s::%s but no such field!', get_class($object), $fieldName),

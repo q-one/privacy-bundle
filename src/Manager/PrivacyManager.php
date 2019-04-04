@@ -27,6 +27,7 @@ namespace QOne\PrivacyBundle\Manager;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 use Psr\Log\LoggerAwareInterface;
@@ -123,9 +124,18 @@ class PrivacyManager implements ContainerAwareInterface, LoggerAwareInterface, P
     {
         $assets = [];
 
+        /** @var ObjectManager $om */
         foreach ($this->registry->getManagers() as $om) {
-            /** @var ObjectManager $om */
-            if (!$om->getMetadataFactory()->isTransient(AssetInterface::class)) {
+            $isManaged = false;
+
+            try {
+                $om->getMetadataFactory()->getMetadataFor(AssetInterface::class);
+                $isManaged = true;
+            } catch(MappingException $e)  {
+                // Do nothing!
+            }
+
+            if ($isManaged) {
                 /** @var AssetRepositoryInterface $repo */
                 $repo = $om->getRepository(AssetInterface::class);
                 $assets = array_merge($assets, $repo->findAssetsForUser($user));
@@ -435,7 +445,15 @@ class PrivacyManager implements ContainerAwareInterface, LoggerAwareInterface, P
     {
         $om = $this->registry->getManager($name);
 
-        if (!$om->getMetadataFactory()->isTransient(AssetInterface::class)) {
+        $isManaged = false;
+        try {
+            $om->getMetadataFactory()->getMetadataFor(AssetInterface::class);
+            $isManaged = true;
+        } catch (MappingException $e) {
+            // Do nothing!
+        }
+
+        if (!$isManaged) {
             throw new \InvalidArgumentException(sprintf('Given object manager "%s" is not configured to manage privacy-audited entities', $name));
         }
 

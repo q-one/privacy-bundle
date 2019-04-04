@@ -134,18 +134,23 @@ class ObsolescenceCommand extends Command implements ContainerAwareInterface
                         $statusColor = 'green';
                     }
 
-                    $output->writeln(sprintf(
-                        '<fg=white><bg=%s;options=bold>%s</> Successfully applied policy "%s" of group %s::%s owned by user %s at %s; Legacy is %010d.</>',
-                        $statusColor,
-                        $statusStr,
-                        $result->getLegacy()->getApplicationPolicy(),
-                        $result->getAsset()->getObject(),
-                        $result->getAsset()->getGroupId(),
-                        $result->getAsset()->getUser(),
-                        $result->getLegacy()->getApplicationTimestamp()->format(\DateTimeInterface::RFC3339),
-                        $result->getLegacy()->getId()
-                    ), OutputInterface::VERBOSITY_VERY_VERBOSE);
-                    ++$obsoletedAssets;
+                    if (null !== $result->getLegacy()) {
+                        $output->writeln(
+                            sprintf(
+                                '<fg=white><bg=%s;options=bold>%s</> Successfully applied policy "%s" of group %s::%s owned by user %s at %s; Legacy is %010d.</>',
+                                $statusColor,
+                                $statusStr,
+                                $result->getLegacy()->getApplicationPolicy(),
+                                $result->getAsset()->getObject(),
+                                $result->getAsset()->getGroupId(),
+                                $result->getAsset()->getUser(),
+                                $result->getLegacy()->getApplicationTimestamp()->format(\DateTimeInterface::RFC3339),
+                                $result->getLegacy()->getId()
+                            ),
+                            OutputInterface::VERBOSITY_VERY_VERBOSE
+                        );
+                        ++$obsoletedAssets;
+                    }
                     break;
 
                 case ObsolescenceResult::ENOSUCHCLASS:
